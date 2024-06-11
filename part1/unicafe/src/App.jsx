@@ -30,7 +30,7 @@ const StatisticLine = ({ text, value }) => {
 
 const Statistics = ({ good, neutral, bad, all, average, positive }) => {
   if (all > 0) {
-    const positiveDisplay = `${positive}%`
+    const positiveDisplay = `${positive} %`
     return (
       <div>
         <table>
