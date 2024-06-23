@@ -112,6 +112,9 @@ const App = () => {
       .then(returnedPerson => {
         setPersons(persons.concat(returnedPerson))
         showNotification(`Added ${returnedPerson.name}`, 'success');
+      }).catch(error => {
+        console.log(error.response.data.error)
+        showNotification(error.response.data.error, 'error')
       })
     } else {
       if(window.confirm(`${newPerson.name} is already added to phonebook, replace the old number with a new one?`)) {
@@ -122,8 +125,11 @@ const App = () => {
           showNotification(`Changed number for ${returnedPerson.name}`, 'success');
         })
         .catch(error => {
-          showNotification(`Information of ${oldPerson.name} has already been removed from server`, 'error');
-          setPersons(persons.filter(p => p.id !== oldPerson.id))
+          console.log(error.response)
+          showNotification(error.response.data.error, 'error')
+          if (error.response.status === 404) {
+            setPersons(persons.filter(p => p.id !== oldPerson.id))
+          }
         })
       }
 
@@ -136,7 +142,7 @@ const App = () => {
       personService
       .remove(id)
       .then(returnedPerson => {
-        setPersons(persons.filter(person => person.id !== returnedPerson.id));
+        setPersons(persons.filter(person => person.id !== id));
         showNotification(`Deleted ${name}`, 'success');
       })
       .catch(error => {
