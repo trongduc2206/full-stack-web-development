@@ -9,6 +9,7 @@ const api = supertest(app)
 const Blog = require('../models/blog')
 const User = require('../models/user')
 
+
 let firstUserToken = ''
 let secondUserToken = ''
 const password='123456'
@@ -35,16 +36,13 @@ describe('test blog apis', () => {
       .send(secondTestUser)
       console.log('created second test user')
 
-
       const firstUserLogin = await api.post('/api/login')
             .send({username: firstTestUser.username, password})
       firstUserToken = `Bearer ${firstUserLogin.body.token}`
-      console.log('token of first user', firstUserToken)
 
       const secondUserLogin = await api.post('/api/login')
             .send({username: secondTestUser.username, password})
       secondUserToken = `Bearer ${secondUserLogin.body.token}`
-      console.log('token of second user', secondUserToken)
     })
 
     beforeEach(async () => {
@@ -280,6 +278,7 @@ describe('test blog apis', () => {
     
 
     after(async () => {
+        await Blog.deleteMany({})
         await mongoose.connection.close()
     })
 

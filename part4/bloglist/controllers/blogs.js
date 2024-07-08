@@ -6,7 +6,7 @@ const User = require('../models/user')
 blogsRouter.get('/', async (request, response) => {
     const blogs = await Blog
       .find({}).populate('user', { username: 1, name: 1 });
-    response.json(blogs)
+    response.json(blogs.sort((a, b) => b.likes - a.likes))
 })
   
 blogsRouter.post('/', async (request, response) => {
@@ -17,20 +17,23 @@ blogsRouter.post('/', async (request, response) => {
     return response.status(401).json({ error: 'token invalid' })
   }
   const user = await User.findById(userFromRequest.id)
+  if (!user) {
+    return response.status(401).json({ error: 'token invalid' })
+  }
 
-    const blog = new Blog({
-      title: body.title,
-      author: body.author,
-      url: body.url,
-      likes: body.likes ? body.likes : 0,
-      user: user._id
-    })
+  const blog = new Blog({
+    title: body.title,
+    author: body.author,
+    url: body.url,
+    likes: body.likes ? body.likes : 0,
+    user: user._id
+  })
 
-    const savedBlog = await blog.save();
-    user.blogs = user.blogs.concat(savedBlog._id)
-    await user.save()
+  const savedBlog = await blog.save();
+  user.blogs = user.blogs.concat(savedBlog._id)
+  await user.save()
 
-    response.status(201).json(savedBlog)
+  response.status(201).json(savedBlog)
 })
 
 blogsRouter.delete('/:id', async (request, response) => {
